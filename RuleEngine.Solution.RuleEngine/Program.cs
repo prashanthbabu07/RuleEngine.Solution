@@ -36,6 +36,43 @@ public interface IRuleNode
     bool Evaluate(Dictionary<string, object> context, RuleEvaluator evaluator);
 }
 
+public interface IOperator<T>
+{
+    string Name { get; }
+    bool Evaluate(T actual, T expected);
+}
+
+public class EqualsStringOperator : IOperator<string>
+{
+    public string Name => "Equals";
+    public bool Evaluate(string actual, string expected) => actual == expected;
+}
+
+public class ContainsOperator : IOperator<string>
+{
+    public string Name => "Contains";
+    public bool Evaluate(string actual, string expected) => actual.Contains(expected);
+}
+
+public class StartsWithOperator : IOperator<string>
+{
+    public string Name => "StartsWith";
+    public bool Evaluate(string actual, string expected) => actual.StartsWith(expected);
+}
+
+public class EqualsNumberOperator : IOperator<double>
+{
+    public string Name => "Equals";
+    public bool Evaluate(double actual, double expected) => actual == expected;
+}
+
+public class GreaterThanOperator : IOperator<double>
+{
+    public string Name => "GreaterThan";
+    public bool Evaluate(double actual, double expected) => actual > expected;
+}
+
+
 public interface IDataType<T>
 {
     string Name { get; }
@@ -51,41 +88,34 @@ public interface IPropertyDefinition
     bool Evaluate(string operatorName, object actual, object expected);
 }
 
-public class NumberDataType : IDataType<double>
+public class DataType<T> : IDataType<T>
 {
-    public string Name => "Number";
+    public string Name { get; }
+    private readonly Dictionary<string, IOperator<T>> _operators = new();
 
-    public IEnumerable<string> GetSupportedOperators() => new[] { "Equals", "GreaterThan" };
+    public DataType(string name)
+    {
+        Name = name;
+    }
 
-    public double ConvertValue(object value) => Convert.ToDouble(value);
+    public void RegisterOperator(IOperator<T> op)
+    {
+        _operators[op.Name] = op;
+    }
 
-    public bool Evaluate(string op, double actual, double expected) =>
-        op switch
-        {
-            "Equals" => actual == expected,
-            "GreaterThan" => actual > expected,
-            _ => throw new NotSupportedException($"Operator '{op}' not supported for {Name}"),
-        };
+    public IEnumerable<string> GetSupportedOperators() => _operators.Keys;
+
+    public bool Evaluate(string operatorName, T actual, T expected)
+    {
+        if (!_operators.TryGetValue(operatorName, out var op))
+            throw new NotSupportedException($"Operator '{operatorName}' is not supported for data type '{Name}'");
+
+        return op.Evaluate(actual, expected);
+    }
+
+    public T ConvertValue(object value) => (T)Convert.ChangeType(value, typeof(T));
 }
 
-public class StringDataType : IDataType<string>
-{
-    public string Name => "String";
-
-    public IEnumerable<string> GetSupportedOperators() =>
-        new[] { "Equals", "Contains", "StartsWith" };
-
-    public string ConvertValue(object value) => Convert.ToString(value) ?? "";
-
-    public bool Evaluate(string op, string actual, string expected) =>
-        op switch
-        {
-            "Equals" => actual == expected,
-            "Contains" => actual.Contains(expected),
-            "StartsWith" => actual.StartsWith(expected),
-            _ => throw new NotSupportedException($"Operator '{op}' not supported for {Name}"),
-        };
-}
 
 public class PropertyDefinition<T> : IPropertyDefinition
 {
@@ -164,8 +194,21 @@ public class Program
     public static void Main()
     {
         var registry = new PropertyRegistry();
-        registry.Register<double>("age", new NumberDataType());
-        registry.Register<string>("country", new StringDataType());
+        // registry.Register<double>("age", new NumberDataType());
+        // registry.Register<string>("country", new StringDataType());
+
+        var stringType = new DataType<string>("String");
+        stringType.RegisterOperator(new EqualsStringOperator());
+        stringType.RegisterOperator(new ContainsOperator());
+        stringType.RegisterOperator(new StartsWithOperator());
+
+        var numberType = new DataType<double>("Number");
+        numberType.RegisterOperator(new EqualsNumberOperator());
+        numberType.RegisterOperator(new GreaterThanOperator());
+
+        registry.Register("age", numberType);
+        registry.Register("country", stringType);
+
 
         var rule1 = new SimpleRule
         {
