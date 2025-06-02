@@ -1,54 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
-//
 
 namespace RuleEngine;
 
-public interface IRuleNode
-{
-    bool Evaluate(Dictionary<string, object> context, RuleEvaluator evaluator);
-}
-
-public interface IOperator<T>
-{
-    string Name { get; }
-    object ConvertValue(object raw);
-    bool Evaluate(T actual, object expected);
-}
-
-public class EqualsStringOperator : IOperator<string>
-{
-    public string Name => "Equals";
-    public object ConvertValue(object raw) => raw?.ToString() ?? "";
-    public bool Evaluate(string actual, object expected) => actual == (string)expected;
-}
-
-public class ContainsOperator : IOperator<string>
-{
-    public string Name => "Contains";
-    public object ConvertValue(object raw) => raw?.ToString() ?? "";
-    public bool Evaluate(string actual, object expected) => actual.Contains((string)expected);
-}
-
-public class StartsWithOperator : IOperator<string>
-{
-    public string Name => "StartsWith";
-    public object ConvertValue(object raw) => raw?.ToString() ?? "";
-    public bool Evaluate(string actual, object expected) => actual.StartsWith((string)expected);
-}
-
-public class EqualsNumberOperator : IOperator<double>
-{
-    public string Name => "Equals";
-    public object ConvertValue(object raw) => Convert.ToDouble(raw);
-    public bool Evaluate(double actual, object expected) => actual == (double)expected;
-}
-
-public class GreaterThanOperator : IOperator<double>
-{
-    public string Name => "GreaterThan";
-    public object ConvertValue(object raw) => Convert.ToDouble(raw);
-    public bool Evaluate(double actual, object expected) => actual > (double)expected;
-}
 
 public interface IDataType<T>
 {
