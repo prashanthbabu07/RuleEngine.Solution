@@ -56,11 +56,12 @@ public class Program
         var context = new Dictionary<string, object>
         {
             ["country"] = "USA",
-            ["age"] = 5
+            ["age"] = 25 
         };
 
         var evaluator = new RuleEvaluator(registry);
-        var result = complexRule.Evaluate(context, evaluator); // returns true
+        var result = evaluator.Evaluate(complexRule, context);
+        // var result = complexRule.Evaluate(context, evaluator); // returns true
         Console.WriteLine($"Rule result: {result}");
         // Console.ReadLine();
 

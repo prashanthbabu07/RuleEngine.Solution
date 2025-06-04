@@ -9,7 +9,28 @@ public class RuleEvaluator
         _registry = registry;
     }
 
-    public bool Evaluate(SimpleRule rule, Dictionary<string, object> context)
+    public bool Evaluate(IRuleNode rule, Dictionary<string, object> context)
+    {
+        return rule switch
+        {
+            SimpleRule simple => EvaluateSimple(simple, context),
+            CompositeRule composite => EvaluateComposite(composite, context),
+            _ => throw new NotSupportedException("Unknown rule type")
+        };
+    }
+
+    private bool EvaluateComposite(CompositeRule rule, Dictionary<string, object> context)
+    {
+        return rule.Operator switch
+        {
+            LogicalOperator.And => rule.Children.All(child => Evaluate(child, context)),
+            LogicalOperator.Or => rule.Children.Any(child => Evaluate(child, context)),
+            _ => throw new NotSupportedException($"Unsupported logical operator: {rule.Operator}")
+        };
+    }
+
+
+    private bool EvaluateSimple(SimpleRule rule, Dictionary<string, object> context)
     {
         var def = _registry.Get(rule.PropertyKey);
 
