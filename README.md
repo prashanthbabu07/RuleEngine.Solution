@@ -22,6 +22,12 @@ i.e. that system should be able to support for adding new properties, operators 
 Since we can have complex data type i.e. unstructured like media files (videos, images etc.). We need to have these types of data transformed into something
 digestible by the rule engine. 
 
+The media content will be pre-processed and extract relevant metadata than can be used in the rules. 
+For example, a video file can have properties like "duration", "resolution", "codec", etc.
 
+[media] -> [pre-processor] -> [metadata] -> [rule engine]
+
+We need the ability to include ML models as <Some operator> in the rules.
+For example, a rule can be defined as "property  "
 
 
