@@ -8,7 +8,7 @@ The core idea is to have a system that can evaluate rules based simple condition
 
 <Some property> <Some operator> <Some value>
 
-<Some property> has a defined data type. e.g. "duration", "resolution", "string", "number", etc.
+<Some property> has a defined data type. e.g. "string", "number", "video" etc.
 <Some operator> has a defined set of operators that can be used to compare the property with the value. e.g. "equals", "in", "greater than", "less than", etc.
 <Some value> can be set depending on <Some operator> i.e. "in" operator can have list of values, "equals" can have a single value, "greater than" can have a single value, etc.
 

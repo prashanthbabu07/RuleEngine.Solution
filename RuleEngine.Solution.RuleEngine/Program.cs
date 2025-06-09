@@ -6,7 +6,7 @@ public class Program
 {
     public static void Main()
     {
-        var registry = new PropertyRegistry();
+        var propertyRegistry = new PropertyRegistry();
 
         var stringType = new DataType<string>("String");
         stringType.RegisterOperator(new EqualsStringOperator());
@@ -17,8 +17,8 @@ public class Program
         numberType.RegisterOperator(new EqualsNumberOperator());
         numberType.RegisterOperator(new GreaterThanOperator());
 
-        registry.Register("country", stringType);
-        registry.Register("age", numberType);
+        propertyRegistry.Register("country", stringType);
+        propertyRegistry.Register("age", numberType);
 
         var complexRule = new CompositeRule
         {
@@ -55,11 +55,11 @@ public class Program
 
         var context = new Dictionary<string, object>
         {
-            ["country"] = "USA",
+            ["country"] = "India",
             ["age"] = 25 
         };
 
-        var evaluator = new RuleEvaluator(registry);
+        var evaluator = new RuleEvaluator(propertyRegistry);
         var result = evaluator.Evaluate(complexRule, context);
         // var result = complexRule.Evaluate(context, evaluator); // returns true
         Console.WriteLine($"Rule result: {result}");

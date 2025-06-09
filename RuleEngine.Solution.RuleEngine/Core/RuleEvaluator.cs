@@ -35,7 +35,9 @@ public class RuleEvaluator
         var def = _registry.Get(rule.PropertyKey);
 
         if (!context.TryGetValue(rule.PropertyKey, out var actualRaw))
+        {
             throw new Exception($"Missing context value for '{rule.PropertyKey}'");
+        }
 
         var actual = def.ConvertActual(actualRaw);
         var expected = def.ConvertExpected(rule.Operator, rule.Value);
