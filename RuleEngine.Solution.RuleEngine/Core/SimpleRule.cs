@@ -6,6 +6,8 @@ public class SimpleRule : IRuleNode
     public string Operator { get; set; } = default!;
     public object Value { get; set; } = default!;
 
-    // public bool Evaluate(Dictionary<string, object> context, RuleEvaluator evaluator)
-    //     => evaluator.Evaluate(this, context);
+    public T Accept<T>(IRuleNodeVisitor<T> visitor)
+    {
+        return visitor.Visit(this);
+    }
 }
